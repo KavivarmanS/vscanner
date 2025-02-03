@@ -1,17 +1,28 @@
 import tkinter as tk
 from tkinter import messagebox
-from controllers.scan_controller import ScanController  # Assuming ScanController is in a separate file
+import os
+import webbrowser
+from controllers.scan_controller import ScanController  # Importing your ScanController class
 
 
 def run_scan():
     profile_id = entry_profile_id.get().strip()
+
     if not profile_id:
         messagebox.showerror("Error", "Profile ID cannot be empty!")
         return
 
     try:
-        ScanController(profile_id)
-        messagebox.showinfo("Success", "Scan completed! The PDF report has been generated.")
+        controller = ScanController()
+        pdf_file = "scan_results.pdf"
+        controller.scan_for_cve(profile_id, pdf_file)
+
+        messagebox.showinfo("Success", f"Scan completed! Report saved as {pdf_file}.")
+
+        # Open the generated PDF automatically
+        if os.path.exists(pdf_file):
+            webbrowser.open(pdf_file)
+
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
 

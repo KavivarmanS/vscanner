@@ -2,16 +2,20 @@ import nmap
 from fpdf import FPDF
 from models.scan_profile_devices_model import ScanProfileDevice
 from models.scan_profile_vulnerabilities_model import ScanProfileVulnerabilities
+from config.db_config import get_db_connection
 
 class ScanController:
 
-    def __init__(self, profile_id):
-        self.profile_id = profile_id
-        self.ipaddresses = ScanProfileDevice.get_ip_address_by_profile_id(self,profile_id)
-        self.cve_ids = ScanProfileVulnerabilities.get_cve_id_by_profile_id(self,profile_id)
-        self.scan_for_cve(self.ipaddresses,self.cve_ids)
+    def __init__(self):
+        self.conn = get_db_connection()
+        self.cursor = self.conn.cursor()
 
-    def scan_for_cve(self, ip_addresses, cve_ids, output_pdf="scan_results.pdf"):
+
+    def scan_for_cve(self, profile_id, output_pdf="scan_results.pdf"):
+
+        ip_addresses = ScanProfileDevice.get_ip_address_by_profile_id(self, profile_id)
+        cve_ids = ScanProfileVulnerabilities.get_cve_id_by_profile_id(self, profile_id)
+
         nm = nmap.PortScanner()
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -23,6 +27,7 @@ class ScanController:
         pdf.ln(10)
 
         pdf.set_font("Arial", size=12)
+
         pdf.cell(200, 10, f"Scanning the following IPs: {', '.join(ip_addresses)}", ln=True)
         pdf.cell(200, 10, f"Checking for CVEs: {', '.join(cve_ids)}", ln=True)
         pdf.ln(10)
