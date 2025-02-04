@@ -40,17 +40,10 @@ CREATE TABLE IF NOT EXISTS Vulnerabilities (
 
 CREATE TABLE IF NOT EXISTS ScanResult (
     ResultID INT PRIMARY KEY AUTO_INCREMENT,
+    ProfileID INT,
     ScanDate DATE NOT NULL,
-    CriticalVulnerabilities INT NOT NULL,
-    TotalVulnerabilities INT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS VulnerabilitiesInScanResult (
-    ResultID INT,
-    VulnerabilityID INT,
-    PRIMARY KEY (ResultID, VulnerabilityID),
-    FOREIGN KEY (ResultID) REFERENCES ScanResult(ResultID),
-    FOREIGN KEY (VulnerabilityID) REFERENCES vulnerabilities(VulnerabilityID)
+    Result VARCHAR(50000) NOT NULL,
+    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS ScanProfileVulnerabilities (

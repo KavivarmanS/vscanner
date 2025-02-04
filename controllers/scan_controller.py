@@ -1,5 +1,4 @@
 import nmap
-from fpdf import FPDF
 from models.scan_profile_devices_model import ScanProfileDevice
 from models.scan_profile_vulnerabilities_model import ScanProfileVulnerabilities
 from config.db_config import get_db_connection
@@ -9,79 +8,54 @@ class ScanController:
     def __init__(self):
         self.conn = get_db_connection()
         self.cursor = self.conn.cursor()
+        self.devide_model = ScanProfileDevice
+        self.vulnerabilities_model = ScanProfileVulnerabilities
 
-
-    def scan_for_cve(self, profile_id, output_pdf="scan_results.pdf"):
-
-        ip_addresses = ScanProfileDevice.get_ip_address_by_profile_id(self, profile_id)
-        cve_ids = ScanProfileVulnerabilities.get_cve_id_by_profile_id(self, profile_id)
-
-        nm = nmap.PortScanner()
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_page()
-        pdf.set_font("Arial", "B", 16)
-
-        # Title
-        pdf.cell(200, 10, "Vulnerability Scan Report", ln=True, align="C")
-        pdf.ln(10)
-
-        pdf.set_font("Arial", size=12)
-
-        pdf.cell(200, 10, f"Scanning the following IPs: {', '.join(ip_addresses)}", ln=True)
-        pdf.cell(200, 10, f"Checking for CVEs: {', '.join(cve_ids)}", ln=True)
-        pdf.ln(10)
+    def scan_for_cves(self,profile_id):
+        ip_addresses = self.devide_model.get_ip_address_by_profile_id(self,profile_id)
+        cve_ids = self.vulnerabilities_model.get_cve_id_by_profile_id(self,profile_id)
+        result_str = ""
 
         for ip_address in ip_addresses:
-            pdf.set_font("Arial", "B", 14)
-            pdf.cell(200, 10, f"Scanning {ip_address}...", ln=True)
-            pdf.ln(5)
+            print(ip_address)
+            ip_address = ip_address[0].strip()
+
+            nm = nmap.PortScanner()
+            result_str += f"\nScanning {ip_address} for vulnerabilities...\n"
+
+            cve_found = False
 
             try:
-                nm.scan(ip_address, arguments='-Pn -sV --script=vulners')
+                nm.scan(ip_address, arguments='-Pn -sV --script=vuln')
 
                 if not nm.all_hosts():
-                    pdf.set_font("Arial", "I", 12)
-                    pdf.cell(200, 10, f"No hosts found at {ip_address}.", ln=True)
-                    pdf.ln(10)
+                    result_str += f"No hosts found at {ip_address}.\n"
                     continue
 
                 for host in nm.all_hosts():
-                    pdf.set_font("Arial", "B", 12)
-                    pdf.cell(200, 10, f"Host: {host} ({nm[host].hostname()})", ln=True)
-                    pdf.cell(200, 10, f"State: {nm[host].state()}", ln=True)
-                    pdf.ln(5)
+                    result_str += f"\nHost: {host} ({nm[host].hostname()})\n"
+                    result_str += f"State: {nm[host].state()}\n"
 
                     for proto in nm[host].all_protocols():
-                        pdf.set_font("Arial", "B", 12)
-                        pdf.cell(200, 10, f"Protocol: {proto}", ln=True)
+                        result_str += f"Protocol: {proto}\n"
 
-                        lport = nm[host][proto].keys()
-                        for port in lport:
-                            pdf.set_font("Arial", size=12)
-                            pdf.cell(200, 10, f"Port: {port} - State: {nm[host][proto][port]['state']}", ln=True)
+                        for port in nm[host][proto]:
+                            state = nm[host][proto][port]['state']
+                            result_str += f"Port: {port} - State: {state}\n"
 
                             if 'script' in nm[host][proto][port]:
                                 for script, output in nm[host][proto][port]['script'].items():
-                                    detected_cves = [cve for cve in cve_ids if cve in output]
-                                    if detected_cves:
-                                        pdf.set_text_color(255, 0, 0)  # Red for vulnerabilities
-                                        pdf.multi_cell(0, 10,
-                                                       f"[!] CVEs detected on port {port}: {', '.join(detected_cves)}",
-                                                       border=1)
-                                        pdf.set_text_color(0, 0, 0)  # Reset color
-                                        pdf.multi_cell(0, 10, f"Details: {output}")
-                                        pdf.ln(5)
-                            else:
-                                pdf.cell(200, 10, f"No vulnerabilities detected on port {port}.", ln=True)
+                                    for cve_id in cve_ids:
+                                        cve_id = cve_id[0].strip().upper()
+                                        if cve_id.startswith("CVE-") and cve_id in output:
+                                            result_str += f"[!] CVE {cve_id} detected on port {port}!\n"
+                                            result_str += f"Details: {output}\n"
+                                            cve_found = True
 
-                        pdf.ln(5)
+                if not cve_found:
+                    result_str += f"[+] No specified CVEs detected on {ip_address}.\n"
 
             except Exception as e:
-                pdf.set_text_color(255, 0, 0)
-                pdf.cell(200, 10, f"An error occurred while scanning {ip_address}: {e}", ln=True)
-                pdf.set_text_color(0, 0, 0)
-                pdf.ln(10)
+                result_str += f"An error occurred while scanning {ip_address}: {e}\n"
 
-        pdf.output(output_pdf)
-        print(f"Scan results saved as {output_pdf}")
+        return result_str

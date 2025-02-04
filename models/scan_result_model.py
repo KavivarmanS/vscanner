@@ -10,17 +10,18 @@ class ScanResultModel:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS ScanResult (
                 ResultID INT PRIMARY KEY AUTO_INCREMENT,
+                ProfileID INT,
                 ScanDate DATE NOT NULL,
-                CriticalVulnerabilities INT NOT NULL,
-                TotalVulnerabilities INT NOT NULL
+                Result VARCHAR(50000) NOT NULL,
+                FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID) ON DELETE CASCADE ON UPDATE CASCADE
             );
         """)
         self.conn.commit()
 
-    def add(self, scan_date, critical_vul, total_vul):
+    def add(self, profile_id, scan_date, result):
 
         try:
-            self.cursor.execute("INSERT INTO ScanResult (ScanDate, CriticalVulnerabilities, TotalVulnerabilities) VALUES (%s, %s, %s)", (scan_date, critical_vul, total_vul))
+            self.cursor.execute("INSERT INTO ScanResult (ProfileID, ScanDate, Result) VALUES (%s, %s, %s)", (profile_id, scan_date, result))
             self.conn.commit()
             return True
         except Exception as e:
@@ -31,8 +32,8 @@ class ScanResultModel:
         self.cursor.execute("SELECT * FROM ScanResult")
         return self.cursor.fetchall()
 
-    def update(self, result_id, scan_date, critical_vul, total_vul):
-        self.cursor.execute("UPDATE ScanResult SET ScanDate = %s, CriticalVulnerabilities = %s, TotalVulnerabilities = %s WHERE ResultID = %s", (scan_date, critical_vul, total_vul, result_id))
+    def update(self, result_id, profile_id, scan_date, result):
+        self.cursor.execute("UPDATE ScanResult SET ProfileID = %s, ScanDate = %s, Result = %s WHERE ResultID = %s", (profile_id, scan_date, result, result_id))
         self.conn.commit()
 
     def delete(self, result_id):
