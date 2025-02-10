@@ -1,8 +1,9 @@
 from models.network_device_model import NetworkDeviceModel
 
 class NetworkDeviceController:
-    def __init__(self):
+    def __init__(self,view):
         self.model = NetworkDeviceModel()
+        self.view = view
 
     def add_device(self, device_name, location, device_type, ip_address):
         self.model.create_device(device_name, location, device_type, ip_address)

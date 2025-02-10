@@ -22,6 +22,9 @@ class Session:
     def get_user(self):
         return self.user_id, self.role
 
+    def get_role(self):
+        return self.role
+
     def save_session(self):
         with open(self.SESSION_FILE, "w") as file:
             json.dump({"user_id": self.user_id, "role": self.role}, file)

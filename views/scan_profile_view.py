@@ -4,38 +4,36 @@ from controllers.scan_profile_controller import ProfileController
 from models.session import Session
 
 
-class ScanProfileWindow:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Scan Profile Manager")
-        self.root.geometry("600x400")
+class ScanProfileView:
+    def __init__(self, parent):
+        self.parent = parent
         self.controller = ProfileController()
         self.session = Session()
         self.user_id, self.role = self.session.get_user()
 
         # Labels & Entries
-        tk.Label(root, text="User ID").grid(row=0, column=0, padx=10, pady=5)
-        self.user_id_entry = tk.Entry(root)
+        tk.Label(parent, text="User ID").grid(row=0, column=0, padx=10, pady=5)
+        self.user_id_entry = tk.Entry(parent)
         self.user_id_entry.grid(row=0, column=1, padx=10, pady=5)
         self.user_id_entry.insert(0, self.user_id)
         self.user_id_entry.config(state="readonly")
 
-        tk.Label(root, text="Scan Frequency").grid(row=1, column=0, padx=10, pady=5)
-        self.scan_frequency_entry = tk.Entry(root)
+        tk.Label(parent, text="Scan Frequency").grid(row=1, column=0, padx=10, pady=5)
+        self.scan_frequency_entry = tk.Entry(parent)
         self.scan_frequency_entry.grid(row=1, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="Profile ID").grid(row=2, column=0, padx=10, pady=5)
-        self.profile_id_entry = tk.Entry(root)
+        tk.Label(parent, text="Profile ID").grid(row=2, column=0, padx=10, pady=5)
+        self.profile_id_entry = tk.Entry(parent)
         self.profile_id_entry.grid(row=2, column=1, padx=10, pady=5)
 
         # Buttons
-        tk.Button(root, text="Add Profile", command=self.add_profile).grid(row=3, column=0, padx=10, pady=5)
-        tk.Button(root, text="Update Profile", command=self.update_profile).grid(row=3, column=1, padx=10, pady=5)
-        tk.Button(root, text="Delete Profile", command=self.delete_profile).grid(row=3, column=2, padx=10, pady=5)
-        tk.Button(root, text="Refresh", command=self.load_data).grid(row=4, column=1, padx=10, pady=5)
+        tk.Button(parent, text="Add Profile", command=self.add_profile).grid(row=3, column=0, padx=10, pady=5)
+        tk.Button(parent, text="Update Profile", command=self.update_profile).grid(row=3, column=1, padx=10, pady=5)
+        tk.Button(parent, text="Delete Profile", command=self.delete_profile).grid(row=3, column=2, padx=10, pady=5)
+        tk.Button(parent, text="Refresh", command=self.load_data).grid(row=4, column=1, padx=10, pady=5)
 
         # Table
-        self.tree = ttk.Treeview(root, columns=("ProfileID", "UserID", "ScanFrequency"), show="headings")
+        self.tree = ttk.Treeview(parent, columns=("ProfileID", "UserID", "ScanFrequency"), show="headings")
         self.tree.heading("ProfileID", text="Profile ID")
         self.tree.heading("UserID", text="User ID")
         self.tree.heading("ScanFrequency", text="Scan Frequency")
@@ -88,3 +86,6 @@ class ScanProfileWindow:
                 messagebox.showerror("Error", f"Failed to delete profile: {e}")
         else:
             messagebox.showwarning("Warning", "Please enter a Profile ID to delete.")
+
+def display(parent):
+    ScanProfileView(parent)

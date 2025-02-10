@@ -43,13 +43,13 @@ CREATE TABLE IF NOT EXISTS ScanResult (
     ProfileID INT,
     ScanDate DATE NOT NULL,
     Result VARCHAR(50000) NOT NULL,
-    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID)
 );
 
 CREATE TABLE IF NOT EXISTS ScanProfileVulnerabilities (
     ProfileID INT,
     VulnerabilityID INT,
     PRIMARY KEY (ProfileID, VulnerabilityID),
-    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID),
+    FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID)
 );

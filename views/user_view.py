@@ -3,34 +3,33 @@ from tkinter import messagebox
 from controllers.user_controller import UserController
 
 class UserView:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("User Management")
+    def __init__(self, parent):
+        self.parent = parent
         self.controller = UserController()
 
         # Username Label and Entry
-        tk.Label(root, text="Username:").grid(row=0, column=0, padx=10, pady=5)
-        self.username_entry = tk.Entry(root)
+        tk.Label(parent, text="Username:").grid(row=0, column=0, padx=10, pady=5)
+        self.username_entry = tk.Entry(parent)
         self.username_entry.grid(row=0, column=1, padx=10, pady=5)
 
         # Password Label and Entry
-        tk.Label(root, text="Password:").grid(row=1, column=0, padx=10, pady=5)
-        self.password_entry = tk.Entry(root, show="*")
+        tk.Label(parent, text="Password:").grid(row=1, column=0, padx=10, pady=5)
+        self.password_entry = tk.Entry(parent, show="*")
         self.password_entry.grid(row=1, column=1, padx=10, pady=5)
 
         # Password Label and Entry
-        tk.Label(root, text="Role:").grid(row=2, column=0, padx=10, pady=5)
-        self.role_entry = tk.Entry(root, show="*")
+        tk.Label(parent, text="Role:").grid(row=2, column=0, padx=10, pady=5)
+        self.role_entry = tk.Entry(parent, show="*")
         self.role_entry.grid(row=2, column=1, padx=10, pady=5)
 
         # Buttons
-        tk.Button(root, text="Create User", command=self.create_user).grid(row=3, column=0, columnspan=2, pady=5)
-        tk.Button(root, text="Show Users", command=self.show_users).grid(row=4, column=0, columnspan=2, pady=5)
-        tk.Button(root, text="Update Password", command=self.update_user).grid(row=5, column=0, columnspan=2, pady=5)
-        tk.Button(root, text="Delete User", command=self.delete_user).grid(row=6, column=0, columnspan=2, pady=5)
+        tk.Button(parent, text="Create User", command=self.create_user).grid(row=3, column=0, columnspan=2, pady=5)
+        tk.Button(parent, text="Show Users", command=self.show_users).grid(row=4, column=0, columnspan=2, pady=5)
+        tk.Button(parent, text="Update Password", command=self.update_user).grid(row=5, column=0, columnspan=2, pady=5)
+        tk.Button(parent, text="Delete User", command=self.delete_user).grid(row=6, column=0, columnspan=2, pady=5)
 
         # User List Display
-        self.user_listbox = tk.Listbox(root, width=40)
+        self.user_listbox = tk.Listbox(parent, width=40)
         self.user_listbox.grid(row=7, column=0, columnspan=2, padx=10, pady=5)
 
     def create_user(self):
@@ -70,3 +69,6 @@ class UserView:
             messagebox.showinfo("Success", "User deleted successfully!")
         else:
             messagebox.showwarning("Warning", "Select a user to delete.")
+
+def display(parent):
+    UserView(parent)
