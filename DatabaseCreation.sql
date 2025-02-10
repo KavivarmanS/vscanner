@@ -53,3 +53,5 @@ CREATE TABLE IF NOT EXISTS ScanProfileVulnerabilities (
     FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID),
     FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID)
 );
+
+INSERT INTO users (UserName, Password, Role) VALUES ('admin', '$2b$12$LjF//9Csfgd1bF86Xfe4FOydezWNXOflvCbHTT2xrQZVL8ktaCFoe', 'admin')
