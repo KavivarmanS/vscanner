@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS NetworkDevice (
     DeviceName VARCHAR(255) NOT NULL,
     Location VARCHAR(255) NOT NULL,
     Type VARCHAR(50) NOT NULL,
-    IPaddress VARCHAR(15) NOT NULL
+    IPaddress VARCHAR(15) NOT NULL,
+    UNIQUE(IPaddress)
 );
 
 CREATE TABLE IF NOT EXISTS ScanProfileDevices (
@@ -35,7 +36,8 @@ CREATE TABLE IF NOT EXISTS Vulnerabilities (
     VulnerabilityID INT PRIMARY KEY AUTO_INCREMENT,
     CVE_ID VARCHAR(20) NOT NULL,
     Description TEXT NOT NULL,
-    SeverityLevel VARCHAR(50) NOT NULL
+    SeverityLevel VARCHAR(50) NOT NULL,
+    UNIQUE(CVE_ID)
 );
 
 CREATE TABLE IF NOT EXISTS ScanResult (

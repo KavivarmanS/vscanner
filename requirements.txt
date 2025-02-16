@@ -1,3 +1,6 @@
 mysql-connector-python
 nmap
 tkinter
+netifaces
+scapy
+geocoder

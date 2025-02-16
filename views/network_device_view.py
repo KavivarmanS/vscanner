@@ -35,6 +35,10 @@ class NetworkDeviceView:
         ttk.Button(self.frame, text="Scan & Add Devices", command=self.on_scan_and_add_clicked).grid(row=2, column=2,
                                                                                                      pady=10)
 
+        self.progress_bar = ttk.Progressbar(self.frame, mode="indeterminate", length=300)
+        self.progress_bar.grid(row=4, column=0, columnspan=3, pady=5)
+        self.progress_bar.grid_remove()
+
         self.progress_label = ttk.Label(self.frame, text="", font=("Arial", 12, "italic"), foreground="blue")
         self.progress_label.grid(row=3, column=0, columnspan=3, pady=5)
 

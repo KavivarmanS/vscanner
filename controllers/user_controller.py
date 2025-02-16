@@ -11,8 +11,11 @@ class UserController:
     def read_users(self):
         return self.model.read_users()
 
-    def update_user(self, username, new_password, role):
-        self.model.update_user(username, new_password, role)
+    def update_user_role(self, username, role):
+        self.model.update_user_role(username, role)
+
+    def update_user_password(self, username, new_password):
+        self.model.update_user_password(username, new_password)
 
     def delete_user(self, username):
         self.model.delete_user(username)

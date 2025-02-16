@@ -29,12 +29,16 @@ class UserModel:
             return False
 
     def read_users(self):
-        self.cursor.execute("SELECT username FROM users")
+        self.cursor.execute("SELECT username,role FROM users")
         return self.cursor.fetchall()
 
-    def update_user(self, username, new_password, role):
+    def update_user_role(self, username, role):
+        self.cursor.execute("UPDATE users SET Role = %s  WHERE username = %s", (role, username))
+        self.conn.commit()
+
+    def update_user_password(self, username, new_password):
         hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-        self.cursor.execute("UPDATE users SET Password = %s ,Role = %s  WHERE username = %s", (hashed_password, role, username))
+        self.cursor.execute("UPDATE users SET Password = %s WHERE username = %s", (hashed_password, username))
         self.conn.commit()
 
     def delete_user(self, username):

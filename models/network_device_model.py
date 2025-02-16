@@ -13,7 +13,8 @@ class NetworkDeviceModel:
                 DeviceName VARCHAR(255) NOT NULL,
                 Location VARCHAR(255) NOT NULL,
                 Type VARCHAR(50) NOT NULL,
-                IPaddress VARCHAR(15) NOT NULL
+                IPaddress VARCHAR(15) NOT NULL,
+                UNIQUE(IPaddress)
             )
         """)
         self.conn.commit()
