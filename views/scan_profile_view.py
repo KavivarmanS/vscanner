@@ -41,6 +41,32 @@ class ScanProfileView:
         self.tree.pack(expand=True, fill=tk.BOTH)
         self.tree.bind("<ButtonRelease-1>", self.on_row_select)
 
+        # Devices and Vulnerabilities Section
+        self.detail_frame = ttk.Frame(self.frame)
+        self.detail_frame.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+        # Devices Table
+        ttk.Label(self.detail_frame, text="Devices", font=("Arial", 12, "bold")).pack()
+        device_columns = ("DeviceID",)
+        self.device_tree = ttk.Treeview(self.detail_frame, columns=device_columns, show="headings", height=5)
+        self.device_tree.heading("DeviceID", text="Device ID")
+        self.device_tree.pack(expand=True, fill=tk.BOTH)
+
+        ttk.Button(self.detail_frame, text="Add Device", command=self.add_device).pack(pady=5)
+        ttk.Button(self.detail_frame, text="Remove Selected Device", command=self.remove_device).pack(pady=5)
+
+        # Vulnerabilities Table
+        ttk.Label(self.detail_frame, text="Vulnerabilities", font=("Arial", 12, "bold")).pack()
+        vulnerability_columns = ("VulnerabilityID",)
+        self.vulnerability_tree = ttk.Treeview(self.detail_frame, columns=vulnerability_columns, show="headings",
+                                               height=5)
+        self.vulnerability_tree.heading("VulnerabilityID", text="Vulnerability ID")
+        self.vulnerability_tree.pack(expand=True, fill=tk.BOTH)
+
+        ttk.Button(self.detail_frame, text="Add Vulnerability", command=self.add_vulnerability).pack(pady=5)
+        ttk.Button(self.detail_frame, text="Remove Selected Vulnerability", command=self.remove_vulnerability).pack(
+            pady=5)
+
     def search_profile(self):
         query = self.search_entry.get().strip().lower()
         for row in self.tree.get_children():
@@ -66,62 +92,60 @@ class ScanProfileView:
 
         item_values = self.tree.item(selected_item, "values")
         if item_values:
-            self.open_profile_management_popup(item_values)
+            self.load_profile_details(item_values[0])
 
-    def open_profile_management_popup(self, profile_data):
-        popup = tk.Toplevel(self.parent)
-        popup.title(f"Manage Profile {profile_data[0]}")
+    def load_profile_details(self, profile_id):
+        # Load Devices
+        for row in self.device_tree.get_children():
+            self.device_tree.delete(row)
+        devices = self.controller.get_devices_by_profile(profile_id)
+        for device in devices:
+            self.device_tree.insert("", "end", values=(device,))
 
-        ttk.Label(popup, text="Manage Devices & Vulnerabilities", font=("Arial", 14, "bold")).pack(pady=10)
+        # Load Vulnerabilities
+        for row in self.vulnerability_tree.get_children():
+            self.vulnerability_tree.delete(row)
+        vulnerabilities = self.controller.get_vulnerabilities_by_profile(profile_id)
+        for vulnerability in vulnerabilities:
+            self.vulnerability_tree.insert("", "end", values=(vulnerability,))
 
-        # Devices Table
-        ttk.Label(popup, text="Devices", font=("Arial", 12, "bold")).pack()
-        device_columns = ("DeviceID",)
-        self.device_tree = ttk.Treeview(popup, columns=device_columns, show="headings", height=5)
-        self.device_tree.heading("DeviceID", text="Device ID")
-        self.device_tree.pack(expand=True, fill=tk.BOTH)
-
-        ttk.Button(popup, text="Add Device", command=lambda: self.add_device(profile_data[0])).pack(pady=5)
-        ttk.Button(popup, text="Remove Selected Device", command=lambda: self.remove_device(profile_data[0])).pack(
-            pady=5)
-
-        # Vulnerabilities Table
-        ttk.Label(popup, text="Vulnerabilities", font=("Arial", 12, "bold")).pack()
-        vulnerability_columns = ("VulnerabilityID",)
-        self.vulnerability_tree = ttk.Treeview(popup, columns=vulnerability_columns, show="headings", height=5)
-        self.vulnerability_tree.heading("VulnerabilityID", text="Vulnerability ID")
-        self.vulnerability_tree.pack(expand=True, fill=tk.BOTH)
-
-        ttk.Button(popup, text="Add Vulnerability", command=lambda: self.add_vulnerability(profile_data[0])).pack(
-            pady=5)
-        ttk.Button(popup, text="Remove Selected Vulnerability",
-                   command=lambda: self.remove_vulnerability(profile_data[0])).pack(pady=5)
-
-    def add_device(self, profile_id):
+    def add_device(self):
         device_id = simpledialog.askstring("Add Device", "Enter Device ID:")
         if device_id:
-            self.controller.add_devices(profile_id, device_id)
-            self.device_tree.insert("", "end", values=(device_id,))
+            selected_item = self.tree.selection()
+            if selected_item:
+                profile_id = self.tree.item(selected_item, "values")[0]
+                self.controller.add_devices(profile_id, device_id)
+                self.device_tree.insert("", "end", values=(device_id,))
 
-    def remove_device(self, profile_id):
+    def remove_device(self):
         selected = self.device_tree.selection()
         if selected:
             device_id = self.device_tree.item(selected, "values")[0]
-            self.controller.remove_devices(profile_id, device_id)
-            self.device_tree.delete(selected)
+            selected_item = self.tree.selection()
+            if selected_item:
+                profile_id = self.tree.item(selected_item, "values")[0]
+                self.controller.remove_devices(profile_id, device_id)
+                self.device_tree.delete(selected)
 
-    def add_vulnerability(self, profile_id):
+    def add_vulnerability(self):
         vulnerability_id = simpledialog.askstring("Add Vulnerability", "Enter Vulnerability ID:")
         if vulnerability_id:
-            self.controller.add_vulnerabilities(profile_id, vulnerability_id)
-            self.vulnerability_tree.insert("", "end", values=(vulnerability_id,))
+            selected_item = self.tree.selection()
+            if selected_item:
+                profile_id = self.tree.item(selected_item, "values")[0]
+                self.controller.add_vulnerabilities(profile_id, vulnerability_id)
+                self.vulnerability_tree.insert("", "end", values=(vulnerability_id,))
 
-    def remove_vulnerability(self, profile_id):
+    def remove_vulnerability(self):
         selected = self.vulnerability_tree.selection()
         if selected:
             vulnerability_id = self.vulnerability_tree.item(selected, "values")[0]
-            self.controller.remove_vulnerabilities(profile_id, vulnerability_id)
-            self.vulnerability_tree.delete(selected)
+            selected_item = self.tree.selection()
+            if selected_item:
+                profile_id = self.tree.item(selected_item, "values")[0]
+                self.controller.remove_vulnerabilities(profile_id, vulnerability_id)
+                self.vulnerability_tree.delete(selected)
 
     def open_add_profile_popup(self):
         popup = tk.Toplevel(self.parent)
