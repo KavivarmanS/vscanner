@@ -56,6 +56,3 @@ This application is designed to manage vulnerabilities and devices associated wi
 4. Push to the branch (`git push origin feature-branch`).
 5. Create a new Pull Request.
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
