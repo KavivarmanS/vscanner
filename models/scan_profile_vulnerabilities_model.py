@@ -56,3 +56,23 @@ class ScanProfileVulnerabilities:
             return False
         finally:
             cursor.close()
+
+    def delete_by_profile_id(self, profile_id):
+        query = "DELETE FROM ScanProfileVulnerabilities WHERE ProfileID = %s "
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(query, (profile_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error: {e}")
+            return False
+        finally:
+            cursor.close()
+
+    def get_vulnerabilities_count_by_profile_id(self,profile_id):
+        self.cursor.execute("SELECT COUNT(s.VulnerabilityID) FROM ScanProfileVulnerabilities s WHERE s.ProfileID= %s", (profile_id, ))
+        return self.cursor.fetchall()
+
+
+

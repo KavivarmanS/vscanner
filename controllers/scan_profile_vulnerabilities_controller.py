@@ -15,3 +15,5 @@ class ScanProfileVulnerabilitiesController:
 
     def delete_scan_profile_vulnerability(self, profile_id, vulnerability_id):
         return self.model.delete(profile_id, vulnerability_id)
+
+

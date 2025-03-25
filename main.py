@@ -3,12 +3,14 @@ from views.login_view import LoginWindow
 from views.dashboard_view import DashBoard
 from views.register_view import RegisterWindow
 from models.session import Session
+import ttkbootstrap as tb
 
 
 class MainApp:
     def __init__(self, root):
         self.root = root
         self.session = Session()
+        self.style = tb.Style()
         self.show_initial_screen()
 
     def show_initial_screen(self):

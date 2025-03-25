@@ -33,7 +33,8 @@ class ScanProfileDevice:
 
     def get_device_by_profile_id(self,profile_id):
         self.cursor.execute("SELECT n.* FROM ScanProfileDevices s INNER JOIN NetworkDevice n ON s.DeviceID = n.DeviceID WHERE s.ProfileID= %s", (profile_id, ))
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
+        return result
 
     def get_ip_address_by_profile_id(self,profile_id):
         self.cursor.execute("SELECT n.IPaddress FROM ScanProfileDevices s INNER JOIN NetworkDevice n ON s.DeviceID = n.DeviceID WHERE s.ProfileID= %s", (profile_id, ))
@@ -41,6 +42,10 @@ class ScanProfileDevice:
 
     def delete(self, profile_id, device_id):
         self.cursor.execute("DELETE FROM ScanProfileDevices WHERE ProfileID = %s AND DeviceID = %s", (profile_id, device_id))
+        self.conn.commit()
+
+    def delete_by_profile_id(self, profile_id):
+        self.cursor.execute("DELETE FROM ScanProfileDevices WHERE ProfileID = %s ", (profile_id,))
         self.conn.commit()
 
 

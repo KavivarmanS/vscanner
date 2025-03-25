@@ -19,8 +19,12 @@ CREATE TABLE IF NOT EXISTS NetworkDevice (
     DeviceID INT PRIMARY KEY AUTO_INCREMENT,
     DeviceName VARCHAR(255) NOT NULL,
     Location VARCHAR(255) NOT NULL,
-    Type VARCHAR(50) NOT NULL,
+    Type VARCHAR(50),
     IPaddress VARCHAR(15) NOT NULL,
+    Low INTEGER,
+    Medium INTEGER,
+    High INTEGER,
+    Critical INTEGER,
     UNIQUE(IPaddress)
 );
 
@@ -35,8 +39,8 @@ CREATE TABLE IF NOT EXISTS ScanProfileDevices (
 CREATE TABLE IF NOT EXISTS Vulnerabilities (
     VulnerabilityID INT PRIMARY KEY AUTO_INCREMENT,
     CVE_ID VARCHAR(20) NOT NULL,
-    Description TEXT NOT NULL,
     SeverityLevel VARCHAR(50) NOT NULL,
+    Description TEXT NOT NULL,
     UNIQUE(CVE_ID)
 );
 
@@ -53,6 +57,29 @@ CREATE TABLE IF NOT EXISTS ScanProfileVulnerabilities (
     VulnerabilityID INT,
     PRIMARY KEY (ProfileID, VulnerabilityID),
     FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID),
+    FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID)
+);
+
+CREATE TABLE IF NOT EXISTS DeviceScans (
+    DeviceID INT NOT NULL,
+    VulnerabilityID INT NOT NULL,
+    Port INT NOT NULL,
+    ScanTimestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (DeviceID, VulnerabilityID, Port),
+    FOREIGN KEY (DeviceID) REFERENCES NetworkDevice(DeviceID),
+    FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID)
+);
+
+CREATE TABLE IF NOT EXISTS ProfileScanResult (
+    ProfileID INT NOT NULL,
+    DeviceID INT NOT NULL,
+    VulnerabilityID INT NOT NULL,
+    Port INT NOT NULL,
+    ScanTimestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Results BOOLEAN NOT NULL ,
+    PRIMARY KEY (ProfileID, DeviceID, VulnerabilityID, Port, ScanTimestamp),
+    FOREIGN KEY (ProfileID) REFERENCES ScanProfile(ProfileID),
+    FOREIGN KEY (DeviceID) REFERENCES NetworkDevice(DeviceID),
     FOREIGN KEY (VulnerabilityID) REFERENCES Vulnerabilities(VulnerabilityID)
 );
 

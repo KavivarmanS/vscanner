@@ -4,3 +4,4 @@ tkinter
 netifaces
 scapy
 geocoder
+matplotlib
